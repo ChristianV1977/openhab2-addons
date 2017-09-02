@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TooManyListenersException;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,7 +146,10 @@ public class SerialConnection {
             bytes.remove(0);
         }
 
-        logger.trace("buffer contains {} bytes: {}", bytes.size(), CommandUtil.bytesToHex(bytes));
+        if (logger.isTraceEnabled()) {
+            logger.trace("buffer contains {} bytes: {}", bytes.size(),
+                    ArrayUtils.toPrimitive(bytes.toArray(new Byte[bytes.size()])));
+        }
         if (bytes.size() > 1) {
             // second byte should be length byte (has to be either 0x04 or 0x05)
             int len = bytes.get(1);

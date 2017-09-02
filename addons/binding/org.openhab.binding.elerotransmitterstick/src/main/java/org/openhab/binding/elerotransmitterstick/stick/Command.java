@@ -42,8 +42,7 @@ public class Command implements Delayed {
             return 0;
         }
 
-        long d = 0 - delayed.getDelay(TimeUnit.MILLISECONDS);
-        return ((d == 0) ? 0 : ((d < 0) ? -1 : 1));
+        return Long.compare(0, delayed.getDelay(TimeUnit.MILLISECONDS));
     }
 
     @Override

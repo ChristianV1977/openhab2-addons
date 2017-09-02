@@ -18,8 +18,6 @@ import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.elerotransmitterstick.config.EleroTransmitterStickConfig;
 import org.openhab.binding.elerotransmitterstick.stick.TransmitterStick;
 import org.openhab.binding.elerotransmitterstick.stick.TransmitterStick.StickListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link EleroTransmitterStickHandler} is responsible for managing the connection to an elero transmitter stick.
@@ -27,8 +25,6 @@ import org.slf4j.LoggerFactory;
  * @author Volker Bier - Initial contribution
  */
 public class EleroTransmitterStickHandler extends BaseBridgeHandler implements BridgeHandler {
-    private final Logger logger = LoggerFactory.getLogger(EleroTransmitterStickHandler.class);
-
     private TransmitterStick stick;
 
     public EleroTransmitterStickHandler(Bridge bridge) {

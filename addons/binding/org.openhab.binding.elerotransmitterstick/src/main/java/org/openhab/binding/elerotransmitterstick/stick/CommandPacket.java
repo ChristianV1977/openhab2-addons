@@ -8,6 +8,8 @@
  */
 package org.openhab.binding.elerotransmitterstick.stick;
 
+import org.apache.commons.codec.binary.Hex;
+
 /**
  * @author Volker Bier - Initial contribution
  */
@@ -50,7 +52,7 @@ public class CommandPacket {
 
     @Override
     public String toString() {
-        return CommandUtil.bytesToHex(data);
+        return Hex.encodeHexString(data);
     }
 
 }
