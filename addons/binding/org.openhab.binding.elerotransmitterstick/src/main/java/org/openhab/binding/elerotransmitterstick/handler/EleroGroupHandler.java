@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class EleroGroupHandler extends EleroChannelHandler {
     private final Logger logger = LoggerFactory.getLogger(EleroGroupHandler.class);
 
-    ResponseStatus[] stati;
+    ArrayList<ResponseStatus> stati;
 
     public EleroGroupHandler(Thing thing) {
         super(thing);
@@ -35,7 +35,11 @@ public class EleroGroupHandler extends EleroChannelHandler {
     @Override
     protected void setChannelIds() {
         channelIds = parseChannelIds(getConfig().as(EleroGroupConfig.class).channelids);
-        stati = new ResponseStatus[channelIds.size()];
+        stati = new ArrayList<>(channelIds.size());
+
+        for (int i = 0; i < channelIds.size(); i++) {
+            stati.add(ResponseStatus.NO_INFORMATION);
+        }
     }
 
     private ArrayList<Integer> parseChannelIds(String channelids) {
@@ -66,7 +70,7 @@ public class EleroGroupHandler extends EleroChannelHandler {
 
         int idx = channelIds.indexOf(channelId);
         if (idx != -1) {
-            stati[idx] = status;
+            stati.set(idx, status);
         }
 
         ResponseStatus commonStatus = null;
