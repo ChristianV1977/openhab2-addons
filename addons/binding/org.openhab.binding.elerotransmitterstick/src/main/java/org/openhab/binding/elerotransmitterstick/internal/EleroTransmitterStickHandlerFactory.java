@@ -37,7 +37,7 @@ import org.osgi.framework.ServiceRegistration;
  */
 public class EleroTransmitterStickHandlerFactory extends BaseThingHandlerFactory {
 
-    private final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = new HashSet<>(2);
+    private final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = new HashSet<>();
     static {
         SUPPORTED_THING_TYPES_UIDS.add(THING_TYPE_STICK);
         SUPPORTED_THING_TYPES_UIDS.add(THING_TYPE_ELERO_CHANNEL);

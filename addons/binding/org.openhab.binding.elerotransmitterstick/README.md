@@ -1,6 +1,6 @@
 # Elero Transmitter Stick Binding
 
-Allows to control Elero rollershutters with openHAB through a connected Elero Transmitter Stick. 
+Allows to control Elero rollershutters through a connected Elero Transmitter Stick. 
 
 ## Supported Things
 
@@ -29,7 +29,7 @@ Discovery is supported only for Elero Channels. Just press the button in order t
 
 ### Elero Group
 
-* Channel IDs: A comma separated list of channel ids. These have to match the channelid property of the respective Elero Channel.
+* Channel IDs: A comma separated list of channel ids (e.g. 1,2,4,15). These have to match the channelid property of the respective Elero Channel.
 
 ## Channels
 

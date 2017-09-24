@@ -8,8 +8,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Import-Package: 
  gnu.io,
- org.apache.commons.codec.binary;version="1.6.0",
- org.apache.commons.lang;version="2.6.0",
+ org.apache.commons.codec.binary,
+ org.apache.commons.lang,
  org.eclipse.jdt.annotation;resolution:=optional,
  org.eclipse.smarthome.config.core,
  org.eclipse.smarthome.config.discovery,

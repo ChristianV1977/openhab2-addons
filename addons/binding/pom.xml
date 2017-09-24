@@ -28,6 +28,7 @@
     <module>org.openhab.binding.coolmasternet</module>
     <module>org.openhab.binding.dlinksmarthome</module>
     <module>org.openhab.binding.dscalarm</module>
+    <module>org.openhab.binding.elerotransmitterstick</module>
     <module>org.openhab.binding.exec</module>
     <module>org.openhab.binding.feed</module>
     <module>org.openhab.binding.feed.test</module>
@@ -89,7 +90,6 @@
     <module>org.openhab.binding.yamahareceiver</module>
     <module>org.openhab.binding.zoneminder</module>
     <module>org.openhab.binding.zway</module>
-    <module>org.openhab.binding.elerotransmitterstick</module>
   </modules>
 
 </project>

@@ -108,8 +108,9 @@ public class EleroChannelHandler extends BaseThingHandler implements StatusListe
 
         updateState(STATUS_CHANNEL, new StringType(status.toString()));
 
-        if (ResponseStatus.getPercentageFor(status) != -1) {
-            updateState(CONTROL_CHANNEL, new PercentType(ResponseStatus.getPercentageFor(status)));
+        int percentage = ResponseStatus.getPercentageFor(status);
+        if (percentage != -1) {
+            updateState(CONTROL_CHANNEL, new PercentType(percentage));
         }
 
         updateStatus(ThingStatus.ONLINE);

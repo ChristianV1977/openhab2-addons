@@ -11,6 +11,8 @@ package org.openhab.binding.elerotransmitterstick.discovery;
 import static org.openhab.binding.elerotransmitterstick.EleroTransmitterStickBindingConstants.*;
 
 import java.util.Collections;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
@@ -30,7 +32,8 @@ public class EleroChannelDiscoveryService extends AbstractDiscoveryService {
     private static final int DISCOVER_TIMEOUT_SECONDS = 30;
     private final Logger logger = LoggerFactory.getLogger(EleroChannelDiscoveryService.class);
 
-    EleroTransmitterStickHandler bridge;
+    private EleroTransmitterStickHandler bridge;
+    private ScheduledFuture<?> sensorDiscoveryJob;
 
     /**
      * Creates the discovery service for the given handler and converter.
@@ -48,38 +51,42 @@ public class EleroChannelDiscoveryService extends AbstractDiscoveryService {
 
     @Override
     protected void startBackgroundDiscovery() {
-        discoverSensors();
+        logger.debug("Start Elero Channel background discovery");
+        if (sensorDiscoveryJob == null || sensorDiscoveryJob.isCancelled()) {
+            sensorDiscoveryJob = scheduler.scheduleWithFixedDelay(() -> {
+                discoverSensors();
+            }, 0, 2, TimeUnit.SECONDS);
+        }
+    }
+
+    @Override
+    protected void stopBackgroundDiscovery() {
+        logger.debug("Stop WeMo device background discovery");
+        if (sensorDiscoveryJob != null && !sensorDiscoveryJob.isCancelled()) {
+            sensorDiscoveryJob.cancel(true);
+            sensorDiscoveryJob = null;
+        }
     }
 
     private void discoverSensors() {
         if (bridge.getStick() == null) {
-            logger.debug("Stick not opened, scanning postponed.");
+            logger.debug("Stick not opened, scanning skipped.");
             return;
         }
 
-        int[] channelIds = null;
+        int[] channelIds = bridge.getStick().getKnownIds();
+        if (channelIds == null) {
+            logger.debug("Could not obtain known channels from the stick, scanning skipped.");
+            return;
+        }
 
-        try {
-            while (channelIds == null) {
-                channelIds = bridge.getStick().getKnownIds();
+        for (int id : channelIds) {
+            ThingUID sensorThing = new ThingUID(THING_TYPE_ELERO_CHANNEL, String.valueOf(id));
 
-                if (channelIds == null) {
-                    Thread.sleep(2000);
-                }
-            }
-
-            for (int id : channelIds) {
-                ThingUID sensorThing = new ThingUID(THING_TYPE_ELERO_CHANNEL, String.valueOf(id));
-
-                DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(sensorThing).withLabel("Channel " + id)
-                        .withRepresentationProperty("id").withBridge(bridge.getThing().getUID())
-                        .withProperty(PROPERTY_CHANNEL_ID, id).build();
-                thingDiscovered(discoveryResult);
-            }
-        } catch (InterruptedException e) {
-            logger.warn("got interrupt while waiting for answer from elero stick {}",
-                    bridge.getThing().getUID().getId());
-            Thread.currentThread().interrupt();
+            DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(sensorThing).withLabel("Channel " + id)
+                    .withRepresentationProperty("id").withBridge(bridge.getThing().getUID())
+                    .withProperty(PROPERTY_CHANNEL_ID, id).build();
+            thingDiscovered(discoveryResult);
         }
     }
 }
