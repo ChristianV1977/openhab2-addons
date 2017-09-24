@@ -8,7 +8,7 @@
  */
 package org.openhab.binding.elerotransmitterstick.handler;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -35,20 +35,19 @@ public class EleroGroupHandler extends EleroChannelHandler {
     @Override
     protected void setChannelIds() {
         channelIds = parseChannelIds(getConfig().as(EleroGroupConfig.class).channelids);
-        stati = new ResponseStatus[channelIds.length];
+        stati = new ResponseStatus[channelIds.size()];
     }
 
-    public static int[] parseChannelIds(String channelids) {
+    private ArrayList<Integer> parseChannelIds(String channelids) {
         String[] idsArr = channelids.split(",");
-        int[] ids = new int[idsArr.length];
-        int idx = 0;
+        ArrayList<Integer> ids = new ArrayList<>();
 
         for (String idStr : idsArr) {
             try {
                 int id = Integer.parseInt(idStr);
 
                 if (id > 0 && id < 16) {
-                    ids[idx++] = id;
+                    ids.add(id);
                 } else {
                     throw new IllegalArgumentException(
                             "id " + idStr + " specified in thing configuration is out of range 1..15");
@@ -58,25 +57,31 @@ public class EleroGroupHandler extends EleroChannelHandler {
             }
         }
 
-        return Arrays.copyOfRange(ids, 0, idx);
+        return ids;
     }
 
     @Override
     public void statusChanged(int channelId, ResponseStatus status) {
         logger.debug("Received updated state {} for thing {}", status, getThing().getUID().toString());
 
-        boolean same = true;
-        for (int i = 0; i < channelIds.length; i++) {
-            if (channelIds[i] == channelId) {
-                stati[i] = status;
-            } else {
-                same = same && status == stati[i];
+        int idx = channelIds.indexOf(channelId);
+        if (idx != -1) {
+            stati[idx] = status;
+        }
+
+        ResponseStatus commonStatus = null;
+        for (ResponseStatus channelStatus : stati) {
+            if (commonStatus == null) {
+                commonStatus = channelStatus;
+            } else if (commonStatus != channelStatus) {
+                commonStatus = null;
+                break;
             }
         }
 
         // if all channels have the same status use this as the group status. otherwise return NO_INFORMATION
-        if (same) {
-            super.statusChanged(channelId, status);
+        if (commonStatus != null) {
+            super.statusChanged(channelId, commonStatus);
         } else {
             super.statusChanged(channelId, ResponseStatus.NO_INFORMATION);
         }

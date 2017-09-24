@@ -19,7 +19,7 @@ public class CommandUtil {
      *
      * @param channelIds channel ids (starting from 1)
      */
-    private static byte[] createChannelBits(int... channelIds) {
+    private static byte[] createChannelBits(Integer... channelIds) {
         long channels = 0;
 
         for (int id : channelIds) {
@@ -32,15 +32,15 @@ public class CommandUtil {
         return buffer.array();
     }
 
-    public static CommandPacket createPacket(Command cmd, int channelId) {
-        return createPacket(cmd.getCommandType(), new int[] { channelId });
+    public static CommandPacket createPacket(Command cmd, Integer channelId) {
+        return createPacket(cmd.getCommandType(), new Integer[] { channelId });
     }
 
     public static CommandPacket createPacket(Command cmd) {
         return createPacket(cmd.getCommandType(), cmd.getChannelIds());
     }
 
-    public static CommandPacket createPacket(CommandType cmd, int... channelIds) {
+    public static CommandPacket createPacket(CommandType cmd, Integer... channelIds) {
         if (cmd == CommandType.INFO) {
             byte[] channelBits = createChannelBits(channelIds);
 

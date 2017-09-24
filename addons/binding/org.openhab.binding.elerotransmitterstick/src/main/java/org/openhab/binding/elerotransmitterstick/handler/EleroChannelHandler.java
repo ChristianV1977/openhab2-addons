@@ -10,6 +10,8 @@ package org.openhab.binding.elerotransmitterstick.handler;
 
 import static org.openhab.binding.elerotransmitterstick.EleroTransmitterStickBindingConstants.*;
 
+import java.util.ArrayList;
+
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.StringType;
@@ -36,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class EleroChannelHandler extends BaseThingHandler implements StatusListener {
     private final Logger logger = LoggerFactory.getLogger(EleroChannelHandler.class);
 
-    protected int[] channelIds;
+    protected ArrayList<Integer> channelIds;
     protected EleroTransmitterStickHandler bridge;
 
     public EleroChannelHandler(Thing thing) {
@@ -48,7 +50,7 @@ public class EleroChannelHandler extends BaseThingHandler implements StatusListe
         bridge = (EleroTransmitterStickHandler) getBridge().getHandler();
 
         setChannelIds();
-        for (int channelId : channelIds) {
+        for (Integer channelId : channelIds) {
             bridge.addStatusListener(channelId, this);
         }
 
@@ -59,7 +61,8 @@ public class EleroChannelHandler extends BaseThingHandler implements StatusListe
 
     protected void setChannelIds() {
         String channelIdStr = getThing().getProperties().get(PROPERTY_CHANNEL_ID);
-        channelIds = new int[] { Integer.parseInt(channelIdStr) };
+        channelIds = new ArrayList<>();
+        channelIds.add(Integer.valueOf(channelIdStr));
     }
 
     @Override

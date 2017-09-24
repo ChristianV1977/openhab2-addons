@@ -10,6 +10,7 @@ package org.openhab.binding.elerotransmitterstick.discovery;
 
 import static org.openhab.binding.elerotransmitterstick.EleroTransmitterStickBindingConstants.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -74,8 +75,8 @@ public class EleroChannelDiscoveryService extends AbstractDiscoveryService {
             return;
         }
 
-        int[] channelIds = bridge.getStick().getKnownIds();
-        if (channelIds == null) {
+        ArrayList<Integer> channelIds = bridge.getStick().getKnownIds();
+        if (channelIds.isEmpty()) {
             logger.debug("Could not obtain known channels from the stick, scanning skipped.");
             return;
         }

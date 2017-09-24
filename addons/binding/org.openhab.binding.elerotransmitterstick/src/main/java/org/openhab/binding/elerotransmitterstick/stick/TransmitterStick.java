@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
@@ -61,16 +60,16 @@ public class TransmitterStick {
         logger.debug("Transmitter Stick disposed.");
     }
 
-    public int[] getKnownIds() {
-        return worker.knownIds;
+    public ArrayList<Integer> getKnownIds() {
+        return worker.validIds;
     }
 
-    public void sendCommand(CommandType cmd, int... channelIds) {
-        worker.executeCommand(cmd, channelIds);
+    public void sendCommand(CommandType cmd, ArrayList<Integer> channelIds) {
+        worker.executeCommand(cmd, channelIds.toArray(new Integer[channelIds.size()]));
     }
 
-    public void requestUpdate(int... channelIds) {
-        worker.requestUpdate(channelIds);
+    public void requestUpdate(ArrayList<Integer> channelIds) {
+        worker.requestUpdate(channelIds.toArray(new Integer[channelIds.size()]));
     }
 
     public void addStatusListener(int channelId, StatusListener listener) {
@@ -178,8 +177,7 @@ public class TransmitterStick {
     }
 
     class CommandWorker extends Thread {
-        int[] knownIds;
-        private HashSet<Integer> validIds = new HashSet<>();
+        private ArrayList<Integer> validIds = new ArrayList<>();
         private final AtomicBoolean terminated = new AtomicBoolean();
         private final int updateInterval;
         private final SerialConnection connection;
@@ -213,7 +211,7 @@ public class TransmitterStick {
             }
         }
 
-        void requestUpdate(int... channelIds) {
+        void requestUpdate(Integer... channelIds) {
             // this is a workaround for a bug in the stick firmware that does not
             // handle commands that are sent to multiple channels correctly
             if (channelIds.length > 1) {
@@ -226,7 +224,7 @@ public class TransmitterStick {
             }
         }
 
-        void executeCommand(CommandType command, int... channelIds) {
+        void executeCommand(CommandType command, Integer... channelIds) {
             // this is a workaround for a bug in the stick firmware that does not
             // handle commands that are sent to multiple channels correctly
             if (channelIds.length > 1) {
@@ -245,7 +243,7 @@ public class TransmitterStick {
             final DueCommandSet dueCommands = new DueCommandSet();
 
             logger.debug("querying available channels...");
-            while (!terminated.get() && knownIds == null) {
+            while (!terminated.get()) {
                 waitConnected();
 
                 try {
@@ -260,14 +258,17 @@ public class TransmitterStick {
                     }
 
                     if (r != null) {
-                        knownIds = r.getChannelIds();
+                        int[] knownIds = r.getChannelIds();
                         logger.debug("Worker found channels: {} ", Arrays.toString(knownIds));
 
                         for (int id : knownIds) {
-                            validIds.add(id);
+                            if (!validIds.contains(id)) {
+                                validIds.add(id);
+                            }
                         }
 
-                        requestUpdate(knownIds);
+                        requestUpdate(validIds.toArray(new Integer[validIds.size()]));
+                        break;
                     }
                 } catch (IOException e) {
                     logger.error("Got IOException communicating with the stick", e);

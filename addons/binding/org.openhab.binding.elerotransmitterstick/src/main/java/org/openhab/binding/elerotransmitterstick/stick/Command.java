@@ -21,12 +21,12 @@ public class Command implements Delayed {
     public static final int FAST_INFO_PRIORITY = 10;
     public static final int INFO_PRIORITY = 0;
 
-    private int[] channelId;
+    private Integer[] channelId;
     private CommandType commandType;
 
     protected int priority = COMMAND_PRIORITY;
 
-    public Command(final CommandType cmd, final int... channels) {
+    public Command(final CommandType cmd, final Integer... channels) {
         channelId = channels;
         commandType = cmd;
     }
@@ -54,7 +54,7 @@ public class Command implements Delayed {
         return priority;
     }
 
-    public int[] getChannelIds() {
+    public Integer[] getChannelIds() {
         return channelId;
     }
 

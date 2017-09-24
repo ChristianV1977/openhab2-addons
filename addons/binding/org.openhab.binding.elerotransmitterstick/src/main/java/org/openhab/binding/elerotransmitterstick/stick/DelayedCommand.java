@@ -18,7 +18,7 @@ public class DelayedCommand extends Command {
     private final long origin;
     private final long delay;
 
-    public DelayedCommand(CommandType cmd, long delayInMillis, int priority, int... channels) {
+    public DelayedCommand(CommandType cmd, long delayInMillis, int priority, Integer... channels) {
         super(cmd, channels);
 
         delay = delayInMillis;
