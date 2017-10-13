@@ -19,11 +19,10 @@ public class DelayedCommand extends Command {
     private final long delay;
 
     public DelayedCommand(CommandType cmd, long delayInMillis, int priority, Integer... channels) {
-        super(cmd, channels);
+        super(cmd, priority, channels);
 
         delay = delayInMillis;
-        this.origin = System.currentTimeMillis();
-        this.priority = priority;
+        origin = System.currentTimeMillis();
     }
 
     @Override
@@ -32,8 +31,7 @@ public class DelayedCommand extends Command {
             return 0;
         }
 
-        long d = (getDelay(TimeUnit.MILLISECONDS) - delayed.getDelay(TimeUnit.MILLISECONDS));
-        return ((d == 0) ? 0 : ((d < 0) ? -1 : 1));
+        return Long.compare(getDelay(TimeUnit.MILLISECONDS), delayed.getDelay(TimeUnit.MILLISECONDS));
     }
 
     @Override

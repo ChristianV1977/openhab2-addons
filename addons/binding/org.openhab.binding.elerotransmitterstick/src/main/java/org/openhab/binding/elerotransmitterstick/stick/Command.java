@@ -31,6 +31,12 @@ public class Command implements Delayed {
         commandType = cmd;
     }
 
+    protected Command(final CommandType cmd, int priority, final Integer... channels) {
+        this(cmd, channels);
+
+        this.priority = priority;
+    }
+
     @Override
     public String toString() {
         return "Command " + commandType + " on channels " + Arrays.toString(channelId) + " with priority " + priority;

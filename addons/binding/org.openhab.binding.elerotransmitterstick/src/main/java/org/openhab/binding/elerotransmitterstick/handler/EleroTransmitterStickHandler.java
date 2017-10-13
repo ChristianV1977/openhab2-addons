@@ -29,27 +29,8 @@ public class EleroTransmitterStickHandler extends BaseBridgeHandler implements B
 
     public EleroTransmitterStickHandler(Bridge bridge) {
         super(bridge);
-    }
 
-    @Override
-    public void handleCommand(ChannelUID channelUid, Command command) {
-    }
-
-    @Override
-    public void dispose() {
-        if (stick != null) {
-            stick.dispose();
-            stick = null;
-        }
-
-        super.dispose();
-    }
-
-    @Override
-    public void initialize() {
-        EleroTransmitterStickConfig config = getConfig().as(EleroTransmitterStickConfig.class);
-
-        stick = new TransmitterStick(config, new StickListener() {
+        stick = new TransmitterStick(new StickListener() {
             @Override
             public void connectionEstablished() {
                 updateStatus(ThingStatus.ONLINE);
@@ -60,9 +41,24 @@ public class EleroTransmitterStickHandler extends BaseBridgeHandler implements B
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR, e.getMessage());
             }
         });
+    }
 
+    @Override
+    public void handleCommand(ChannelUID channelUid, Command command) {
+    }
+
+    @Override
+    public void dispose() {
+        stick.dispose();
+
+        super.dispose();
+    }
+
+    @Override
+    public void initialize() {
         updateStatus(ThingStatus.UNKNOWN);
-        stick.initialize();
+
+        stick.initialize(getConfig().as(EleroTransmitterStickConfig.class), scheduler);
     }
 
     public TransmitterStick getStick() {

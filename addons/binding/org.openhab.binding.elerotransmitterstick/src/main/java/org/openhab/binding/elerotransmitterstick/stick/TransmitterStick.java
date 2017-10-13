@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.DelayQueue;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -31,32 +32,29 @@ import org.slf4j.LoggerFactory;
  */
 public class TransmitterStick {
     private final Logger logger = LoggerFactory.getLogger(TransmitterStick.class);
-
-    private final CommandWorker worker;
-
     private final HashMap<Integer, ArrayList<StatusListener>> allListeners = new HashMap<>();
-
     private final StickListener listener;
 
     private EleroTransmitterStickConfig config;
+    private CommandWorker worker;
 
-    public TransmitterStick(EleroTransmitterStickConfig stickConfig, StickListener l) {
-        config = stickConfig;
-        worker = new CommandWorker();
-
+    public TransmitterStick(StickListener l) {
         listener = l;
     }
 
-    public synchronized void initialize() {
+    public synchronized void initialize(EleroTransmitterStickConfig stickConfig, ScheduledExecutorService scheduler) {
         logger.debug("Initializing Transmitter Stick...");
-        worker.start();
+        config = stickConfig;
+        worker = new CommandWorker();
+        scheduler.schedule(worker, 0, TimeUnit.MILLISECONDS);
         logger.debug("Transmitter Stick initialized, worker running.");
     }
 
     public synchronized void dispose() {
         logger.debug("Disposing Transmitter Stick...");
-        allListeners.clear();
         worker.terminateUpdates();
+        worker = null;
+        config = null;
         logger.debug("Transmitter Stick disposed.");
     }
 
@@ -176,7 +174,7 @@ public class TransmitterStick {
         }
     }
 
-    class CommandWorker extends Thread {
+    class CommandWorker implements Runnable {
         private ArrayList<Integer> validIds = new ArrayList<>();
         private final AtomicBoolean terminated = new AtomicBoolean();
         private final int updateInterval;
@@ -196,7 +194,6 @@ public class TransmitterStick {
         CommandWorker() {
             connection = new SerialConnection(config.portName);
             updateInterval = config.updateInterval;
-            setDaemon(true);
         }
 
         void terminateUpdates() {
@@ -204,11 +201,6 @@ public class TransmitterStick {
 
             // add a NONE command to make the thread exit from the call to take()
             cmdQueue.add(new Command(CommandType.NONE));
-            try {
-                join();
-            } catch (InterruptedException e) {
-                logger.debug("Interrupted while waiting for terminated worker", e);
-            }
         }
 
         void requestUpdate(Integer... channelIds) {

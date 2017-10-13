@@ -62,7 +62,7 @@ public class EleroChannelDiscoveryService extends AbstractDiscoveryService {
 
     @Override
     protected void stopBackgroundDiscovery() {
-        logger.debug("Stop WeMo device background discovery");
+        logger.debug("Stop Elero Channel background discovery");
         if (sensorDiscoveryJob != null && !sensorDiscoveryJob.isCancelled()) {
             sensorDiscoveryJob.cancel(true);
             sensorDiscoveryJob = null;
@@ -81,7 +81,7 @@ public class EleroChannelDiscoveryService extends AbstractDiscoveryService {
             return;
         }
 
-        for (int id : channelIds) {
+        for (Integer id : channelIds) {
             ThingUID sensorThing = new ThingUID(THING_TYPE_ELERO_CHANNEL, String.valueOf(id));
 
             DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(sensorThing).withLabel("Channel " + id)

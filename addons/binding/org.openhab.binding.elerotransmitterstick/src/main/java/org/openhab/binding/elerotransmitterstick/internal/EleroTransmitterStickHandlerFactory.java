@@ -23,11 +23,13 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
+import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
 import org.openhab.binding.elerotransmitterstick.discovery.EleroChannelDiscoveryService;
 import org.openhab.binding.elerotransmitterstick.handler.EleroChannelHandler;
 import org.openhab.binding.elerotransmitterstick.handler.EleroGroupHandler;
 import org.openhab.binding.elerotransmitterstick.handler.EleroTransmitterStickHandler;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * The {@link EleroTransmitterStickHandlerFactory} is responsible for creating things and thing
@@ -35,6 +37,7 @@ import org.osgi.framework.ServiceRegistration;
  *
  * @author Volker Bier - Initial contribution
  */
+@Component(service = ThingHandlerFactory.class, immediate = true, configurationPid = "discovery.elerotransmitterstick")
 public class EleroTransmitterStickHandlerFactory extends BaseThingHandlerFactory {
 
     private final static Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = new HashSet<>();

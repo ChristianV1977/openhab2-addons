@@ -67,9 +67,22 @@ SWITCHED_ON | 50
 In case of Elero Groups, the status is NO_INFORMATION as long as not all connectd channels have the same status, the status of the channels otherwise. 
 
 
-## Example usage
+## Full Example
+
+A typical thing configuration looks like this:
 
 ```
-Rollershutter Rollershutter1 (gRollershutters) {channel="elerotransmitterstick:elerochannel:1:control",autoupdate="false" }
+```
+
+A typical item configuration for a rollershutter looks like this:
+
+```
+Rollershutter Rollershutter1 {channel="elerotransmitterstick:elerochannel:1:control",autoupdate="false" }
 String Rollershutter1State  {channel="elerotransmitterstick:elerochannel:1:status" } 
+```
+
+A sitemap entry looks like this:
+
+```
+Selection item=Rollershutter1 label=“Kitchen” mappings=[0=“open”, 100=“closed”, 25=“shading”]
 ```
