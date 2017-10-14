@@ -24,6 +24,7 @@ import org.eclipse.smarthome.core.thing.ThingStatusInfo;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
+import org.openhab.binding.elerotransmitterstick.config.EleroChannelConfig;
 import org.openhab.binding.elerotransmitterstick.stick.CommandType;
 import org.openhab.binding.elerotransmitterstick.stick.ResponseStatus;
 import org.slf4j.Logger;
@@ -60,15 +61,16 @@ public class EleroChannelHandler extends BaseThingHandler implements StatusListe
     }
 
     protected void setChannelIds() {
-        String channelIdStr = getThing().getProperties().get(PROPERTY_CHANNEL_ID);
         channelIds = new ArrayList<>();
-        channelIds.add(Integer.valueOf(channelIdStr));
+        channelIds.add(getConfig().as(EleroChannelConfig.class).channelId);
     }
 
     @Override
     public void dispose() {
-        for (Integer channelId : channelIds) {
-            bridge.removeStatusListener(channelId, this);
+        if (bridge != null) {
+            for (Integer channelId : channelIds) {
+                bridge.removeStatusListener(channelId, this);
+            }
         }
     }
 

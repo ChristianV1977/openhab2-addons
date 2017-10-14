@@ -18,6 +18,8 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
+import org.eclipse.smarthome.config.discovery.DiscoveryServiceCallback;
+import org.eclipse.smarthome.config.discovery.ExtendedDiscoveryService;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.openhab.binding.elerotransmitterstick.handler.EleroTransmitterStickHandler;
 import org.slf4j.Logger;
@@ -29,12 +31,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author Volker Bier - Initial contribution
  */
-public class EleroChannelDiscoveryService extends AbstractDiscoveryService {
+public class EleroChannelDiscoveryService extends AbstractDiscoveryService implements ExtendedDiscoveryService {
     private static final int DISCOVER_TIMEOUT_SECONDS = 30;
     private final Logger logger = LoggerFactory.getLogger(EleroChannelDiscoveryService.class);
 
     private EleroTransmitterStickHandler bridge;
     private ScheduledFuture<?> sensorDiscoveryJob;
+
+    private DiscoveryServiceCallback discoveryServiceCallback;
 
     /**
      * Creates the discovery service for the given handler and converter.
@@ -46,8 +50,19 @@ public class EleroChannelDiscoveryService extends AbstractDiscoveryService {
     }
 
     @Override
+    public void setDiscoveryServiceCallback(DiscoveryServiceCallback callback) {
+        discoveryServiceCallback = callback;
+    }
+
+    @Override
     protected void startScan() {
         discoverSensors();
+    }
+
+    @Override
+    protected synchronized void stopScan() {
+        super.stopScan();
+        removeOlderResults(getTimestampOfLastScan());
     }
 
     @Override
@@ -82,12 +97,15 @@ public class EleroChannelDiscoveryService extends AbstractDiscoveryService {
         }
 
         for (Integer id : channelIds) {
-            ThingUID sensorThing = new ThingUID(THING_TYPE_ELERO_CHANNEL, String.valueOf(id));
+            ThingUID sensorThing = new ThingUID(THING_TYPE_ELERO_CHANNEL, bridge.getThing().getUID(),
+                    String.valueOf(id));
 
-            DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(sensorThing).withLabel("Channel " + id)
-                    .withRepresentationProperty("id").withBridge(bridge.getThing().getUID())
-                    .withProperty(PROPERTY_CHANNEL_ID, id).build();
-            thingDiscovered(discoveryResult);
+            if (discoveryServiceCallback.getExistingThing(sensorThing) == null) {
+                DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(sensorThing).withLabel("Channel " + id)
+                        .withRepresentationProperty("id").withBridge(bridge.getThing().getUID())
+                        .withProperty(PROPERTY_CHANNEL_ID, id).build();
+                thingDiscovered(discoveryResult);
+            }
         }
     }
 }

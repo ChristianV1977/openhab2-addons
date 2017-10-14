@@ -28,10 +28,18 @@
 		<label>Elero Channel</label>
 		<description>One of the 15 elero channels available on an Elero Transmitter Stick.</description>
 
-		<channels>
-			<channel id="control" typeId="control" />
-			<channel id="status" typeId="status" />
-		</channels>
+        <channels>
+            <channel id="control" typeId="control" />
+            <channel id="status" typeId="status" />
+        </channels>
+
+        <config-description>
+            <parameter name="channelId" type="integer" min="1" max="15" step="1" readOnly="true">
+                <label>Channel ID</label>
+                <description>The id of this channel.</description>
+                <required>true</required>
+            </parameter>
+        </config-description>
 	</thing-type>
 
 	<thing-type id="elerogroup">

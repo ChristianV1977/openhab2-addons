@@ -31,6 +31,10 @@ Discovery is supported only for Elero Channels. Just press the button in order t
 
 * Channel IDs: A comma separated list of channel ids (e.g. 1,2,4,15). These have to match the channelid property of the respective Elero Channel.
 
+### Elero Channel
+
+* Channel ID: The ID of one of the 15 channels that are available on the stick (in the range of 1-15). 
+
 ## Channels
 
 * Control: Rollershutter channel allowing to control the Elero Channel(s). Supports UP, DOWN, STOP and the following distinct percentages:
@@ -72,13 +76,15 @@ In case of Elero Groups, the status is NO_INFORMATION as long as not all connect
 A typical thing configuration looks like this:
 
 ```
+Bridge elerotransmitterstick:elerostick:0a0a0a0a [ portName="/dev/ttyElero2", updateInterval=5000 ]
+Thing elerotransmitterstick:elerochannel:0a0a0a0a:1 (elerotransmitterstick:elerostick:0a0a0a0a) [ channelId=1 ]
 ```
 
 A typical item configuration for a rollershutter looks like this:
 
 ```
-Rollershutter Rollershutter1 {channel="elerotransmitterstick:elerochannel:1:control",autoupdate="false" }
-String Rollershutter1State  {channel="elerotransmitterstick:elerochannel:1:status" } 
+Rollershutter Rollershutter1 {channel="elerotransmitterstick:elerochannel:0a0a0a0a:1:control",autoupdate="false" }
+String Rollershutter1State  {channel="elerotransmitterstick:elerochannel:0a0a0a0a:1:status" } 
 ```
 
 A sitemap entry looks like this:
