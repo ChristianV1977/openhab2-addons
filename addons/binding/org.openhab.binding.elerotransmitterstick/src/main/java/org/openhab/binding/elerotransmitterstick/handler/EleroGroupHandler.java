@@ -9,6 +9,8 @@
 package org.openhab.binding.elerotransmitterstick.handler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -26,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class EleroGroupHandler extends EleroChannelHandler {
     private final Logger logger = LoggerFactory.getLogger(EleroGroupHandler.class);
 
-    ArrayList<ResponseStatus> stati;
+    Map<Integer, ResponseStatus> channelStatusMap = new HashMap<>();
 
     public EleroGroupHandler(Thing thing) {
         super(thing);
@@ -35,11 +37,7 @@ public class EleroGroupHandler extends EleroChannelHandler {
     @Override
     protected void setChannelIds() {
         channelIds = parseChannelIds(getConfig().as(EleroGroupConfig.class).channelids);
-        stati = new ArrayList<>(channelIds.size());
-
-        for (int i = 0; i < channelIds.size(); i++) {
-            stati.add(ResponseStatus.NO_INFORMATION);
-        }
+        channelStatusMap.clear();
     }
 
     private ArrayList<Integer> parseChannelIds(String channelids) {
@@ -65,16 +63,15 @@ public class EleroGroupHandler extends EleroChannelHandler {
     }
 
     @Override
-    public void statusChanged(int channelId, ResponseStatus status) {
-        logger.debug("Received updated state {} for thing {}", status, getThing().getUID().toString());
+    public void statusChanged(int channelId, ResponseStatus respStatus) {
+        logger.debug("Received updated state {} for thing {}", respStatus, getThing().getUID().toString());
 
-        int idx = channelIds.indexOf(channelId);
-        if (idx != -1) {
-            stati.set(idx, status);
+        if (channelIds.contains(channelId)) {
+            channelStatusMap.put(channelId, respStatus);
         }
 
         ResponseStatus commonStatus = null;
-        for (ResponseStatus channelStatus : stati) {
+        for (ResponseStatus channelStatus : channelStatusMap.values()) {
             if (commonStatus == null) {
                 commonStatus = channelStatus;
             } else if (commonStatus != channelStatus) {

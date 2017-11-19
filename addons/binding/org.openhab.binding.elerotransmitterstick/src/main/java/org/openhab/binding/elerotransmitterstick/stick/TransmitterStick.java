@@ -12,9 +12,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.DelayQueue;
@@ -68,13 +70,13 @@ public class TransmitterStick {
 
     public synchronized void sendCommand(CommandType cmd, ArrayList<Integer> channelIds) {
         if (worker != null) {
-            worker.executeCommand(cmd, channelIds.toArray(new Integer[channelIds.size()]));
+            worker.executeCommand(cmd, channelIds);
         }
     }
 
     public synchronized void requestUpdate(ArrayList<Integer> channelIds) {
         if (worker != null) {
-            worker.requestUpdate(channelIds.toArray(new Integer[channelIds.size()]));
+            worker.requestUpdates(channelIds);
         }
     }
 
@@ -211,29 +213,33 @@ public class TransmitterStick {
             cmdQueue.add(new Command(CommandType.NONE));
         }
 
-        void requestUpdate(Integer... channelIds) {
+        void requestUpdates(List<Integer> channelIds) {
             // this is a workaround for a bug in the stick firmware that does not
             // handle commands that are sent to multiple channels correctly
-            if (channelIds.length > 1) {
+            if (channelIds.size() > 1) {
                 for (int channelId : channelIds) {
-                    requestUpdate(channelId);
+                    requestUpdates(Collections.singletonList(channelId));
                 }
-            } else if (channelIds.length == 1) {
-                logger.debug("adding INFO command for channel id {} to queue...", Arrays.toString(channelIds));
-                cmdQueue.add(new DelayedCommand(CommandType.INFO, 0, Command.FAST_INFO_PRIORITY, channelIds));
+            } else if (!channelIds.isEmpty()) {
+                final Integer[] ids = channelIds.toArray(new Integer[channelIds.size()]);
+
+                logger.debug("adding INFO command for channel id {} to queue...", Arrays.toString(ids));
+                cmdQueue.add(new DelayedCommand(CommandType.INFO, 0, Command.FAST_INFO_PRIORITY, ids));
             }
         }
 
-        void executeCommand(CommandType command, Integer... channelIds) {
+        void executeCommand(CommandType command, List<Integer> channelIds) {
             // this is a workaround for a bug in the stick firmware that does not
             // handle commands that are sent to multiple channels correctly
-            if (channelIds.length > 1) {
+            if (channelIds.size() > 1) {
                 for (int channelId : channelIds) {
-                    executeCommand(command, channelId);
+                    executeCommand(command, Collections.singletonList(channelId));
                 }
-            } else if (channelIds.length == 1) {
-                logger.debug("adding command {} for channel ids {} to queue...", command, Arrays.toString(channelIds));
-                cmdQueue.add(new Command(command, channelIds));
+            } else if (!channelIds.isEmpty()) {
+                final Integer[] ids = channelIds.toArray(new Integer[channelIds.size()]);
+
+                logger.debug("adding command {} for channel ids {} to queue...", command, Arrays.toString(ids));
+                cmdQueue.add(new Command(command, ids));
             }
         }
 
@@ -355,7 +361,7 @@ public class TransmitterStick {
                             }
                         }
 
-                        requestUpdate(validIds.toArray(new Integer[validIds.size()]));
+                        requestUpdates(validIds);
                         break;
                     }
                 } catch (IOException e) {
