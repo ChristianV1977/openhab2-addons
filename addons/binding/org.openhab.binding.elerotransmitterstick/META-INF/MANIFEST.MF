@@ -5,11 +5,11 @@ Bundle-SymbolicName: org.openhab.binding.elerotransmitterstick;singleton:=true
 Bundle-Vendor: openHAB
 Bundle-Version: 2.2.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ lib/commons-codec-1.8.jar,
+ lib/commons-lang3-3.4.jar
 Import-Package: 
  gnu.io,
- org.apache.commons.codec.binary,
- org.apache.commons.lang,
  org.eclipse.jdt.annotation;resolution:=optional,
  org.eclipse.smarthome.config.core,
  org.eclipse.smarthome.config.discovery,
