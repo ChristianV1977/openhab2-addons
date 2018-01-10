@@ -11,6 +11,7 @@
 			<parameter name="portName" type="text" required="true">
 				<label>Port Name</label>
 				<description>The name of the port to which the Elero Transmitter Stick is connected.</description>
+				<context>serial-port</context>
 			</parameter>
 			<parameter name="updateInterval" type="integer" min="5" max="3600" unit="s" step="5">
 				<label>Update Interval</label>
